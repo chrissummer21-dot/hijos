@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body {
+    margin: 0;
+    background: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#container {
+
+    position: absolute;
+    bottom: 60px;
+    left: 60px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 12px 22px;
+
+    background: rgba(20,20,20,0.75);
+    border-radius: 18px;
+
+    backdrop-filter: blur(12px);
+
+    opacity: 0;
+    transform: translateX(-50px) scale(0.95);
+
+}
+
+#avatar {
+
+    width: 85px;
+    height: 85px;
+
+    border-radius: 12px;
+
+    margin-right: 18px;
+
+    transform: scale(0.8);
+}
+
+#name {
+
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+
+/* ENTRADA */
+
+.animate-in {
+
+    animation: slideFadeIn 0.7s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.animate-avatar {
+
+    animation: avatarPop 0.6s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+.animate-text {
+
+    animation: textSlide 0.6s ease forwards;
+    animation-delay: 0.2s;
+}
+
+
+/* SALIDA */
+
+.animate-out {
+
+    animation: slideFadeOut 0.5s ease forwards;
+}
+
+
+/* KEYFRAMES */
+
+@keyframes slideFadeIn {
+
+    from {
+        opacity:0;
+        transform:translateX(-60px) scale(0.9);
+    }
+
+    to {
+        opacity:1;
+        transform:translateX(0) scale(1);
+    }
+}
+
+@keyframes slideFadeOut {
+
+    from {
+        opacity:1;
+        transform:translateX(0) scale(1);
+    }
+
+    to {
+        opacity:0;
+        transform:translateX(40px) scale(0.9);
+    }
+}
+
+@keyframes avatarPop {
+
+    from {
+        transform:scale(0.6);
+    }
+
+    to {
+        transform:scale(1);
+    }
+}
+
+@keyframes textSlide {
+
+    from {
+        opacity:0;
+        transform:translateX(-30px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="container">
+
+    <img id="avatar">
+    <div id="name"></div>
+
+</div>
+
+
+<script>
+
+let users = []
+let index = 0
+
+const container = document.getElementById("container")
+const avatar = document.getElementById("avatar")
+const name = document.getElementById("name")
+
+
+async function cargar() {
+
+    const res = await fetch("overlay_data.json")
+    users = await res.json()
+
+    ciclo()
+}
+
+
+function mostrarUsuario(user) {
+
+    avatar.src = user.avatar
+    name.innerText = user.displayName
+
+    container.classList.remove("animate-out")
+    container.classList.add("animate-in")
+
+    avatar.classList.add("animate-avatar")
+    name.classList.add("animate-text")
+}
+
+
+function ocultarUsuario() {
+
+    container.classList.remove("animate-in")
+    container.classList.add("animate-out")
+
+    avatar.classList.remove("animate-avatar")
+    name.classList.remove("animate-text")
+}
+
+
+function ciclo() {
+
+    if(users.length == 0) return
+
+    mostrarUsuario(users[index])
+
+    setTimeout(() => {
+
+        ocultarUsuario()
+
+        setTimeout(() => {
+
+            index++
+            if(index >= users.length)
+                index = 0
+
+            mostrarUsuario(users[index])
+
+        }, 500)
+
+    }, 3500)
+
+    setInterval(() => {
+
+        ocultarUsuario()
+
+        setTimeout(() => {
+
+            index++
+            if(index >= users.length)
+                index = 0
+
+            mostrarUsuario(users[index])
+
+        }, 500)
+
+    }, 4000)
+}
+
+cargar()
+
+</script>
+
+</body>
+</html>
